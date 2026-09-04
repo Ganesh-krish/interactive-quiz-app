@@ -107,6 +107,32 @@ function calculateScore() {
     scoreElement.textContent = `Score: ${score}`;
 }
 
+function saveAnswers() {
+    localStorage.setItem(
+        "quizAnswers",
+        JSON.stringify(userAnswers)
+    );
+}
+
+function loadAnswers() {
+
+    const savedAnswers =
+        localStorage.getItem("quizAnswers");
+
+    if (savedAnswers !== null) {
+
+        userAnswers = JSON.parse(savedAnswers);
+
+    }
+}
+
+
+function clearSavedQuiz() {
+    localStorage.removeItem("quizAnswers");
+}
+
+
+
 function handleTimeUp() {
 
     console.log("Time's up!");
@@ -114,6 +140,7 @@ function handleTimeUp() {
     answered = true;
 
     userAnswers[currentQuestion] = null;
+    saveAnswers();
 
     optionsElement.forEach((option) => {
 
@@ -126,6 +153,7 @@ function handleTimeUp() {
         if (currentQuestion < questions.length - 1) {
 
             currentQuestion++;
+
 
             displayQuestion();
 
@@ -238,6 +266,8 @@ function displayQuestion() {
 }
 
 
+
+loadAnswers();
 // Display first question
 
 displayQuestion();
@@ -286,7 +316,8 @@ optionsElement.forEach((option) => {
         clearInterval(timer);
 
         userAnswers[currentQuestion] = option.textContent;
-
+        saveAnswers();
+        
         if (option.textContent === questions[currentQuestion].answer) {
 
             option.classList.add("correct");
@@ -337,6 +368,8 @@ function showResult() {
 restartButton.addEventListener("click", function () {
 
     clearInterval(timer);
+
+    clearSavedQuiz();
 
     currentQuestion = 0;
 

@@ -76,12 +76,49 @@ const previousButton =
 const scoreElement =
     document.querySelector("#score");
 
+const timerElement =
+    document.querySelector("#timer");
+    
 // Current question
 
 let currentQuestion = 0;
 let score = 0;
 let answered = false;
 let userAnswers = [];
+let timeLeft = 15;
+let timer;
+
+
+
+
+function startTimer() {
+
+    clearInterval(timer);
+
+    timeLeft = 15;
+
+    timerElement.textContent =
+        `${timeLeft}s`;
+
+    timer = setInterval(function () {
+
+        timeLeft--;
+
+        timerElement.textContent =
+            `${timeLeft}s`;
+
+        if (timeLeft === 0) {
+
+            clearInterval(timer);
+
+            console.log("Time's up!");
+
+        }
+
+    }, 1000);
+
+}
+
 
 // Display question
 
@@ -141,6 +178,8 @@ function displayQuestion() {
 
     // Update score on screen
     scoreElement.textContent = `Score: ${score}`;
+
+    startTimer();
 }
 
 

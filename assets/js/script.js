@@ -80,6 +80,8 @@ const restartButton = document.querySelector("#restart-btn");
 
 const quizCard = document.querySelector(".quiz-card");
 
+let timerEndTime = null;
+
 // Current question
 let currentQuestion = 0;
 let score = 0;
@@ -193,7 +195,15 @@ function startTimer() {
 
     clearInterval(timer);
 
-    timeLeft = 15;
+    if (timerEndTime === null) {
+
+        saveTimerEndTime();
+
+    }
+
+    timeLeft = Math.ceil(
+        (timerEndTime - Date.now()) / 1000
+    );
 
     timerElement.textContent =
         `${timeLeft}s`;
@@ -211,15 +221,11 @@ function startTimer() {
 
             console.log("Time's up!");
 
-             handleTimeUp();
-
-
+            handleTimeUp();
         }
 
     }, 1000);
-
 }
-
 
 // Display question
 
@@ -288,9 +294,35 @@ function displayQuestion() {
 }
 
 
+function saveTimerEndTime() {
+
+    timerEndTime = Date.now() + (15 * 1000);
+    
+    localStorage.setItem("timerEndTime",timerEndTime);
+}
+
+
+function loadTimerEndTime() {
+
+    const savedTimerEndTime = localStorage.getItem("timerEndTime");
+
+    if(savedTimerEndTime !=null){
+       timerEndTime =  JSON.parse(savedTimerEndTime);
+    }
+}
+
+
+function clearTimerEndTime() {
+
+    timerEndTime = null;
+
+    localStorage.removeItem("timerEndTime");
+}
+
 
 loadAnswers();
 loadCurrentQuestion();
+loadTimerEndTime();
 calculateScore();
 displayQuestion();
 

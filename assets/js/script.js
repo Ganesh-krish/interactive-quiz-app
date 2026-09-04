@@ -90,6 +90,34 @@ let timer;
 
 
 
+function handleTimeUp() {
+
+    console.log("Time's up!");
+
+    answered = true;
+
+    userAnswers[currentQuestion] = null;
+
+    optionsElement.forEach((option) => {
+
+        option.disabled = true;
+
+    });
+
+    setTimeout(function () {
+
+        if (currentQuestion < questions.length - 1) {
+
+            currentQuestion++;
+
+            displayQuestion();
+
+        }
+
+    }, 1000);
+
+}
+
 
 function startTimer() {
 
@@ -112,6 +140,9 @@ function startTimer() {
             clearInterval(timer);
 
             console.log("Time's up!");
+
+             handleTimeUp();
+
 
         }
 

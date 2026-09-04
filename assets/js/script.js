@@ -58,29 +58,29 @@ const questions = [
 
 // DOM Elements
 
-const questionElement =
-    document.querySelector("#question");
+const questionElement = document.querySelector("#question");
 
-const questionNumberElement =
-    document.querySelector("#question-number");
+const questionNumberElement = document.querySelector("#question-number");
 
-const optionsElement =
-    document.querySelectorAll(".option");
+const optionsElement = document.querySelectorAll(".option");
 
-const nextButton =
-    document.querySelector("#next-btn");
+const nextButton = document.querySelector("#next-btn");
 
-const previousButton =
-    document.querySelector("#previous-btn");
+const previousButton = document.querySelector("#previous-btn");
 
-const scoreElement =
-    document.querySelector("#score");
+const scoreElement = document.querySelector("#score");
 
-const timerElement =
-    document.querySelector("#timer");
-    
+const timerElement = document.querySelector("#timer");
+
+const resultContainer = document.querySelector("#result-container");
+
+const finalScoreElement = document.querySelector("#final-score");
+
+const restartButton = document.querySelector("#restart-btn");
+
+const quizCard = document.querySelector(".quiz-card");
+
 // Current question
-
 let currentQuestion = 0;
 let score = 0;
 let answered = false;
@@ -112,6 +112,9 @@ function handleTimeUp() {
 
             displayQuestion();
 
+        } else {
+
+        showResult();
         }
 
     }, 1000);
@@ -308,5 +311,40 @@ optionsElement.forEach((option) => {
         console.log("Score:", score);
 
     });
+
+});
+
+
+function showResult() {
+
+    clearInterval(timer);
+
+    quizCard.style.display = "none";
+
+    resultContainer.style.display = "block";
+
+    finalScoreElement.textContent =
+        `Your Score: ${score} / ${questions.length}`;
+
+}
+
+
+restartButton.addEventListener("click", function () {
+
+    clearInterval(timer);
+
+    currentQuestion = 0;
+
+    score = 0;
+
+    answered = false;
+
+    userAnswers = [];
+
+    resultContainer.style.display = "none";
+
+    quizCard.style.display = "block";
+
+    displayQuestion();
 
 });

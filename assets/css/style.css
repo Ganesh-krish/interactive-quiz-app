@@ -126,3 +126,40 @@ body {
 .option:disabled {
     cursor: not-allowed;
 }
+
+
+.result-container {
+    display: none;
+
+    max-width: 600px;
+    margin: auto;
+    padding: 30px;
+
+    background: white;
+    border-radius: 10px;
+
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+
+    text-align: center;
+}
+
+.result-container h2 {
+    margin-bottom: 20px;
+}
+
+#final-score {
+    margin-bottom: 20px;
+    font-size: 20px;
+}
+
+#restart-btn {
+    padding: 12px 20px;
+
+    border: none;
+    border-radius: 5px;
+
+    background: black;
+    color: white;
+
+    cursor: pointer;
+}

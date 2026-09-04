@@ -126,12 +126,33 @@ function loadAnswers() {
     }
 }
 
-
 function clearSavedQuiz() {
+
     localStorage.removeItem("quizAnswers");
+
+    localStorage.removeItem("currentQuestion");
 }
 
 
+function saveCurrentQuestion() {
+    localStorage.setItem(
+        "currentQuestion",
+        currentQuestion
+    );
+}
+
+
+function loadCurrentQuestion() {
+
+    const savedQuestion =
+        localStorage.getItem("currentQuestion");
+
+    if (savedQuestion !== null) {
+
+        currentQuestion = Number(savedQuestion);
+
+    }
+}
 
 function handleTimeUp() {
 
@@ -154,6 +175,7 @@ function handleTimeUp() {
 
             currentQuestion++;
 
+            saveCurrentQuestion();
 
             displayQuestion();
 
@@ -268,8 +290,8 @@ function displayQuestion() {
 
 
 loadAnswers();
-// Display first question
-
+loadCurrentQuestion();
+calculateScore();
 displayQuestion();
 
 
@@ -280,6 +302,8 @@ nextButton.addEventListener("click", function () {
     if (currentQuestion < questions.length - 1) {
 
         currentQuestion++;
+
+        saveCurrentQuestion();
 
         displayQuestion();
 
@@ -297,6 +321,8 @@ previousButton.addEventListener("click", function () {
     if (currentQuestion > 0) {
 
         currentQuestion--;
+
+        saveCurrentQuestion();
 
         displayQuestion();
     }
@@ -354,6 +380,10 @@ optionsElement.forEach((option) => {
 function showResult() {
 
     clearInterval(timer);
+
+    localStorage.removeItem("quizAnswers");
+    localStorage.removeItem("currentQuestion");
+
 
     quizCard.style.display = "none";
 

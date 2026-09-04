@@ -88,7 +88,24 @@ let userAnswers = [];
 let timeLeft = 15;
 let timer;
 
+function calculateScore() {
+    score = 0;
 
+    userAnswers.forEach((userAnswer, index) => {
+
+        if (userAnswer === undefined || userAnswer === null) {
+            return;
+        }
+
+        if (userAnswer === questions[index].answer) {
+            score++;
+        } else {
+            score--;
+        }
+    });
+
+    scoreElement.textContent = `Score: ${score}`;
+}
 
 function handleTimeUp() {
 
@@ -213,7 +230,11 @@ function displayQuestion() {
     // Update score on screen
     scoreElement.textContent = `Score: ${score}`;
 
-    startTimer();
+    if (!answered) {
+        startTimer();
+    } else {
+        clearInterval(timer);
+    }
 }
 
 
@@ -226,10 +247,15 @@ displayQuestion();
 
 nextButton.addEventListener("click", function () {
 
-    if ( currentQuestion < questions.length - 1) {
+    if (currentQuestion < questions.length - 1) {
+
         currentQuestion++;
 
         displayQuestion();
+
+    } else {
+
+        showResult();
 
     }
 
@@ -250,7 +276,6 @@ previousButton.addEventListener("click", function () {
 
 // Option Click Events
 optionsElement.forEach((option) => {
-
     option.addEventListener("click", function () {
 
         if (answered) {
@@ -258,62 +283,42 @@ optionsElement.forEach((option) => {
         }
 
         answered = true;
+        clearInterval(timer);
 
-        userAnswers[currentQuestion] =
-            option.textContent;
+        userAnswers[currentQuestion] = option.textContent;
 
-        if (
-            option.textContent ===
-            questions[currentQuestion].answer
-        ) {
-
-            score++;
+        if (option.textContent === questions[currentQuestion].answer) {
 
             option.classList.add("correct");
-
             console.log("Correct!");
 
         } else {
 
             option.classList.add("wrong");
 
-            // Find and highlight correct answer
             optionsElement.forEach((option) => {
 
                 if (
                     option.textContent ===
                     questions[currentQuestion].answer
                 ) {
-
                     option.classList.add("correct");
                 }
 
             });
 
-            if (score > 0) {
-                score--;
-            }
-
             console.log("Wrong!");
         }
 
-        // Disable all options
         optionsElement.forEach((option) => {
-
             option.disabled = true;
-
         });
 
-        // Update score
-        scoreElement.textContent =
-            `Score: ${score}`;
+        calculateScore();
 
         console.log("Score:", score);
-
     });
-
 });
-
 
 function showResult() {
 

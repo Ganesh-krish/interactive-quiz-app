@@ -163,3 +163,9 @@ body {
 
     cursor: pointer;
 }
+
+#timer.warning {
+    font-weight: bold;
+    transform: scale(1.1);
+    color: red;
+}

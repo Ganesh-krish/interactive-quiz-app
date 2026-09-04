@@ -58,63 +58,93 @@ const questions = [
 
 // DOM Elements
 
-const questionElement = document.querySelector("#question");
+const questionElement =
+    document.querySelector("#question");
 
-const questionNumberElement = document.querySelector("#question-number");
+const questionNumberElement =
+    document.querySelector("#question-number");
 
-const optionsElement = document.querySelectorAll(".option");
+const optionsElement =
+    document.querySelectorAll(".option");
 
-const nextButton = document.querySelector("#next-btn");
+const nextButton =
+    document.querySelector("#next-btn");
 
-const previousButton = document.querySelector("#previous-btn");
+const previousButton =
+    document.querySelector("#previous-btn");
 
-const scoreElement = document.querySelector("#score");
+const scoreElement =
+    document.querySelector("#score");
 
-const timerElement = document.querySelector("#timer");
+const timerElement =
+    document.querySelector("#timer");
 
-const resultContainer = document.querySelector("#result-container");
+const resultContainer =
+    document.querySelector("#result-container");
 
-const finalScoreElement = document.querySelector("#final-score");
+const finalScoreElement =
+    document.querySelector("#final-score");
 
-const restartButton = document.querySelector("#restart-btn");
+const restartButton =
+    document.querySelector("#restart-btn");
 
-const quizCard = document.querySelector(".quiz-card");
+const quizCard =
+    document.querySelector(".quiz-card");
 
-let timerEndTime = null;
 
-// Current question
+// Application state
+
 let currentQuestion = 0;
 let score = 0;
 let answered = false;
 let userAnswers = [];
 let timeLeft = 15;
-let timer;
+
+let timer = null;
+let timerEndTime = null;
+
+// Calculate Score
 
 function calculateScore() {
+
     score = 0;
 
     userAnswers.forEach((userAnswer, index) => {
 
-        if (userAnswer === undefined || userAnswer === null) {
+        if (
+            userAnswer === undefined ||
+            userAnswer === null
+        ) {
             return;
         }
 
-        if (userAnswer === questions[index].answer) {
+        if (
+            userAnswer === questions[index].answer
+        ) {
             score++;
         } else {
             score--;
         }
+
     });
 
-    scoreElement.textContent = `Score: ${score}`;
+    scoreElement.textContent =
+        `Score: ${score}`;
 }
 
+
+// Save Answers
+
 function saveAnswers() {
+
     localStorage.setItem(
         "quizAnswers",
         JSON.stringify(userAnswers)
     );
 }
+
+
+// Load Answers
 
 function loadAnswers() {
 
@@ -123,26 +153,25 @@ function loadAnswers() {
 
     if (savedAnswers !== null) {
 
-        userAnswers = JSON.parse(savedAnswers);
+        userAnswers =
+            JSON.parse(savedAnswers);
 
     }
 }
 
-function clearSavedQuiz() {
 
-    localStorage.removeItem("quizAnswers");
-
-    localStorage.removeItem("currentQuestion");
-}
-
+// Save Current Question
 
 function saveCurrentQuestion() {
+
     localStorage.setItem(
         "currentQuestion",
         currentQuestion
     );
 }
 
+
+// Load Current Question
 
 function loadCurrentQuestion() {
 
@@ -151,18 +180,83 @@ function loadCurrentQuestion() {
 
     if (savedQuestion !== null) {
 
-        currentQuestion = Number(savedQuestion);
+        currentQuestion =
+            Number(savedQuestion);
 
     }
 }
+
+
+// Save Timer End Time
+
+function saveTimerEndTime() {
+
+    timerEndTime =
+        Date.now() + (15 * 1000);
+
+    localStorage.setItem(
+        "timerEndTime",
+        timerEndTime
+    );
+}
+
+
+// Load Timer End Time
+
+function loadTimerEndTime() {
+
+    const savedTimerEndTime =
+        localStorage.getItem("timerEndTime");
+
+    if (savedTimerEndTime !== null) {
+
+        timerEndTime =
+            JSON.parse(savedTimerEndTime);
+
+    }
+}
+
+
+// Clear Timer End Time
+
+function clearTimerEndTime() {
+
+    timerEndTime = null;
+
+    localStorage.removeItem(
+        "timerEndTime"
+    );
+}
+
+
+// Clear Saved Quiz
+
+function clearSavedQuiz() {
+
+    localStorage.removeItem(
+        "quizAnswers"
+    );
+
+    localStorage.removeItem(
+        "currentQuestion"
+    );
+
+    clearTimerEndTime();
+}
+
+
+// Handle Time Up
 
 function handleTimeUp() {
 
     console.log("Time's up!");
 
+    clearTimerEndTime();
+
     answered = true;
 
     userAnswers[currentQuestion] = null;
+
     saveAnswers();
 
     optionsElement.forEach((option) => {
@@ -171,9 +265,13 @@ function handleTimeUp() {
 
     });
 
+
     setTimeout(function () {
 
-        if (currentQuestion < questions.length - 1) {
+        if (
+            currentQuestion <
+            questions.length - 1
+        ) {
 
             currentQuestion++;
 
@@ -183,7 +281,8 @@ function handleTimeUp() {
 
         } else {
 
-        showResult();
+            showResult();
+
         }
 
     }, 1000);
@@ -191,9 +290,15 @@ function handleTimeUp() {
 }
 
 
+// Start Timer
+
 function startTimer() {
 
     clearInterval(timer);
+
+
+    // If there is no saved timer,
+    // create a new 15-second timer
 
     if (timerEndTime === null) {
 
@@ -201,12 +306,28 @@ function startTimer() {
 
     }
 
+
+    // Calculate remaining time
+
     timeLeft = Math.ceil(
         (timerEndTime - Date.now()) / 1000
     );
 
+
+    // If saved timer already expired
+
+    if (timeLeft <= 0) {
+
+        handleTimeUp();
+
+        return;
+
+    }
+
+
     timerElement.textContent =
         `${timeLeft}s`;
+
 
     timer = setInterval(function () {
 
@@ -215,61 +336,83 @@ function startTimer() {
         timerElement.textContent =
             `${timeLeft}s`;
 
-        if (timeLeft === 0) {
+        if (timeLeft <= 5) {
+            timerElement.classList.add("warning");
+        }
+        if (timeLeft <= 0) {
 
             clearInterval(timer);
 
             console.log("Time's up!");
 
             handleTimeUp();
+
         }
 
     }, 1000);
+
 }
 
-// Display question
+
+// Display Question
 
 function displayQuestion() {
 
-    answered = userAnswers[currentQuestion] !== undefined;
+    answered =
+        userAnswers[currentQuestion] !== undefined;
+
 
     questionElement.textContent =
         questions[currentQuestion].question;
 
+
     questionNumberElement.textContent =
         `Question ${currentQuestion + 1} of ${questions.length}`;
+
 
     optionsElement.forEach((option, index) => {
 
         option.textContent =
             questions[currentQuestion].options[index];
 
+
         // Reset old classes
+
         option.classList.remove(
             "selected",
             "correct",
             "wrong"
         );
 
+
         // Enable buttons by default
+
         option.disabled = false;
 
-        // If the question was already answered
+
+        // If question was already answered
+
         if (answered) {
 
-            // Disable all options
             option.disabled = true;
 
-            // Show the correct answer
+
+            // Show correct answer
+
             if (
                 option.textContent ===
                 questions[currentQuestion].answer
             ) {
 
-                option.classList.add("correct");
+                option.classList.add(
+                    "correct"
+                );
+
             }
 
-            // Show the user's wrong answer
+
+            // Show user's wrong answer
+
             if (
                 option.textContent ===
                 userAnswers[currentQuestion] &&
@@ -277,149 +420,238 @@ function displayQuestion() {
                 questions[currentQuestion].answer
             ) {
 
-                option.classList.add("wrong");
+                option.classList.add(
+                    "wrong"
+                );
+
             }
+
         }
 
     });
 
-    // Update score on screen
-    scoreElement.textContent = `Score: ${score}`;
+
+    // Update score
+
+    scoreElement.textContent =
+        `Score: ${score}`;
+
+
+    // Start timer only for unanswered question
 
     if (!answered) {
+
         startTimer();
+
     } else {
+
         clearInterval(timer);
+
     }
+
 }
 
 
-function saveTimerEndTime() {
-
-    timerEndTime = Date.now() + (15 * 1000);
-    
-    localStorage.setItem("timerEndTime",timerEndTime);
-}
-
-
-function loadTimerEndTime() {
-
-    const savedTimerEndTime = localStorage.getItem("timerEndTime");
-
-    if(savedTimerEndTime !=null){
-       timerEndTime =  JSON.parse(savedTimerEndTime);
-    }
-}
-
-
-function clearTimerEndTime() {
-
-    timerEndTime = null;
-
-    localStorage.removeItem("timerEndTime");
-}
-
+// Load saved data
 
 loadAnswers();
+
 loadCurrentQuestion();
+
 loadTimerEndTime();
+
 calculateScore();
+
 displayQuestion();
 
 
-// Next button
+// Next Button
 
-nextButton.addEventListener("click", function () {
+nextButton.addEventListener(
+    "click",
+    function () {
 
-    if (currentQuestion < questions.length - 1) {
+        if (
+            currentQuestion <
+            questions.length - 1
+        ) {
 
-        currentQuestion++;
+            // Current question is being left
 
-        saveCurrentQuestion();
+            clearInterval(timer);
 
-        displayQuestion();
+            clearTimerEndTime();
 
-    } else {
+            timerElement.classList.remove("warning");
 
-        showResult();
+            currentQuestion++;
 
-    }
+            saveCurrentQuestion();
 
-});
-
-
-previousButton.addEventListener("click", function () {
-
-    if (currentQuestion > 0) {
-
-        currentQuestion--;
-
-        saveCurrentQuestion();
-
-        displayQuestion();
-    }
-
-});
-
-
-// Option Click Events
-optionsElement.forEach((option) => {
-    option.addEventListener("click", function () {
-
-        if (answered) {
-            return;
-        }
-
-        answered = true;
-        clearInterval(timer);
-
-        userAnswers[currentQuestion] = option.textContent;
-        saveAnswers();
-        
-        if (option.textContent === questions[currentQuestion].answer) {
-
-            option.classList.add("correct");
-            console.log("Correct!");
+            displayQuestion();
 
         } else {
 
-            option.classList.add("wrong");
+            showResult();
 
-            optionsElement.forEach((option) => {
-
-                if (
-                    option.textContent ===
-                    questions[currentQuestion].answer
-                ) {
-                    option.classList.add("correct");
-                }
-
-            });
-
-            console.log("Wrong!");
         }
 
-        optionsElement.forEach((option) => {
-            option.disabled = true;
-        });
+    }
+);
 
-        calculateScore();
 
-        console.log("Score:", score);
-    });
+// Previous Button
+
+previousButton.addEventListener(
+    "click",
+    function () {
+
+        if (currentQuestion > 0) {
+
+            // Current question is being left
+
+            clearInterval(timer);
+
+            clearTimerEndTime();
+
+            timerElement.classList.remove("warning");
+
+            currentQuestion--;
+
+            saveCurrentQuestion();
+
+            displayQuestion();
+
+        }
+
+    }
+);
+
+
+// Option Click Events
+
+optionsElement.forEach((option) => {
+
+    option.addEventListener(
+        "click",
+        function () {
+
+            if (answered) {
+
+                return;
+
+            }
+
+
+            answered = true;
+
+            clearInterval(timer);
+
+            clearTimerEndTime();
+
+            timerElement.classList.remove("warning");
+            // Save user's answer
+
+            userAnswers[currentQuestion] =
+                option.textContent;
+
+            saveAnswers();
+
+
+            // Check answer
+
+            if (
+                option.textContent ===
+                questions[currentQuestion].answer
+            ) {
+
+                option.classList.add(
+                    "correct"
+                );
+
+                console.log("Correct!");
+
+            } else {
+
+                option.classList.add(
+                    "wrong"
+                );
+
+
+                // Show correct answer
+
+                optionsElement.forEach(
+                    (option) => {
+
+                        if (
+                            option.textContent ===
+                            questions[currentQuestion].answer
+                        ) {
+
+                            option.classList.add(
+                                "correct"
+                            );
+
+                        }
+
+                    }
+                );
+
+                console.log("Wrong!");
+
+            }
+
+
+            // Disable all options
+
+            optionsElement.forEach(
+                (option) => {
+
+                    option.disabled = true;
+
+                }
+            );
+
+
+            // Recalculate score
+
+            calculateScore();
+
+            console.log(
+                "Score:",
+                score
+            );
+
+        }
+    );
+
 });
+
+
+// Show Result
 
 function showResult() {
 
     clearInterval(timer);
 
-    localStorage.removeItem("quizAnswers");
-    localStorage.removeItem("currentQuestion");
+    clearTimerEndTime();
+
+    localStorage.removeItem(
+        "quizAnswers"
+    );
+
+    localStorage.removeItem(
+        "currentQuestion"
+    );
 
 
-    quizCard.style.display = "none";
+    quizCard.style.display =
+        "none";
 
-    resultContainer.style.display = "block";
+
+    resultContainer.style.display =
+        "block";
+
 
     finalScoreElement.textContent =
         `Your Score: ${score} / ${questions.length}`;
@@ -427,24 +659,35 @@ function showResult() {
 }
 
 
-restartButton.addEventListener("click", function () {
+// Restart Button
 
-    clearInterval(timer);
+restartButton.addEventListener(
+    "click",
+    function () {
 
-    clearSavedQuiz();
+        clearInterval(timer);
 
-    currentQuestion = 0;
+        clearSavedQuiz();
 
-    score = 0;
 
-    answered = false;
+        currentQuestion = 0;
 
-    userAnswers = [];
+        score = 0;
 
-    resultContainer.style.display = "none";
+        answered = false;
 
-    quizCard.style.display = "block";
+        userAnswers = [];
 
-    displayQuestion();
 
-});
+        resultContainer.style.display =
+            "none";
+
+
+        quizCard.style.display =
+            "block";
+
+
+        displayQuestion();
+
+    }
+);
